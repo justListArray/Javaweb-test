@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学生宿舍管理系统</title>
+    <style>
+        /* 重写样式 */
+        body {
+        background-image: url("image/background.jpg");
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #000080;
+            color: #fff;
+            text-align: center;
+            padding: 10px 0;
+        }
+
+        nav {
+            background-color: skyblue;
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+
+        nav h2 {
+            display: inline;
+            margin-right: 20px;
+        }
+
+        nav a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        #backend-response {
+            margin: 20px;
+        }
+
+        .student-item {
+            display: flex;
+            /* 使用flex布局 */
+            align-items: flex-start;
+            /* 垂直方向上顶部对齐 */
+            padding: 10px;
+            box-sizing: border-box;
+            border: 3px solid black;
+            background-color: white;
+            /* 假设你想要白色背景 */
+        }
+
+        .student-image {
+            flex: 0 0 auto;
+            /* 不放大、不缩小、自动宽度 */
+            margin-right: 10px;
+            /* 图片与文字之间的间隔 */
+            width: 100px;
+            /* 你可以根据需要设置图片的宽度 */
+            height: auto;
+            object-fit: cover;
+        }
+
+        .student-details {
+            flex: 1 1 auto;
+            /* 放大、缩小、自动宽度 */
+            /* 其他你想要的样式 */
+        }
+
+        /* 如果你还想让文字部分有固定的宽度，你可以设置 max-width */
+        .student-details p {
+            margin: 0 0 5px 0;
+            /* 设置段落之间的垂直间隔 */
+        }
+    </style>
+
+</head>
+
+<body>
+    <header>
+        <h1>学生宿舍管理系统</h1>
+    </header>
+    <nav>
+        <h2><a href="#searchStudent" onclick="searchStudent()">查询学生</a></h2>
+        <h2><a href="#addStudent" onclick="addStudent()">添加学生</a></h2>
+        <h2><a href="#deleteStudent" onclick="deleteStudent()">删除学生</a></h2>
+    </nav>
+    <div id="backend-response">
+        <!-- 这里将会接受后端传来的请求 -->
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            fetch('http://localhost:8080/getStudents')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch data');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const studentsData = data.data;
+                    const backendResponse = document.getElementById('backend-response');
+                    backendResponse.innerHTML = ''; // 清空旧的内容
+
+                    studentsData.forEach(student => {
+                        const studentItem = document.createElement('div');
+                        studentItem.classList.add('student-item');
+
+                        const imageElement = document.createElement('img');
+                        imageElement.src = `./image/${student.image}`; // 假设图片路径已知
+                        imageElement.alt = student.name;
+                        imageElement.classList.add('student-image'); // added class for styling
+
+                        const details = document.createElement('div');
+                        details.classList.add('student-details');
+                        details.innerHTML = `
+                            <p><strong>姓名:</strong> ${student.name}</p>
+                            <p><strong>宿舍号:</strong> ${student.dormitoryNumber}</p>
+                            <p><strong>房间号:</strong> ${student.roomNumber}</p>
+                            <p><strong>性别:</strong> ${student.gender}</p>
+                            <p><strong>ID:</strong> ${student.id}</p>
+                        `;
+
+                        studentItem.appendChild(imageElement);
+                        studentItem.appendChild(details);
+                        backendResponse.appendChild(studentItem);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                    // 可以在这里添加错误处理的UI代码，比如显示一个错误消息
+                });
+        });
+
+        function deleteStudent() {
+            var studentID = prompt("请输入要删除的学生ID");
+            if (studentID != null) {
+                fetch('http://localhost:8080/deleteStudent?ID=' + studentID, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => console.log(data))
+                    .catch(error => console.error('Error:', error));
+            }
+        }
+
+        function searchStudent() {
+            var roomNumber = prompt("请输入宿舍号");
+            if (roomNumber !== null) {
+                fetch('http://localhost:8080/searchStudent?roomNumber=' + roomNumber, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        data.data.forEach(student => {
+                            alert(
+                                `Name: ${student.name}\nDormitory Number: ${student.dormitoryNumber}\nRoom Number: ${student.roomNumber}\nGender: ${student.gender}`
+                            );
+                        });
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+        }
+
+        function addStudent() {
+            const ID = prompt("请输入ID:");
+            const image = prompt("请输入照片名称:");
+            const name = prompt("请输入姓名:");
+            const dormitoryNumber = prompt("请输入宿舍楼");
+            const roomNumber = prompt("请输入房间号");
+            const gender = prompt("请输入性别");
+
+            const studentData = {
+                ID: ID,
+                image: image,
+                name: name,
+                dormitoryNumber: dormitoryNumber,
+                roomNumber: roomNumber,
+                gender: gender
+            };
+
+            const params = new URLSearchParams(studentData).toString();
+
+            fetch(`http://localhost:8080/addStudent?${params}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.code === 1) {
+                        alert("添加成功！");
+                        // Close any modal or perform other actions upon successful addition
+                    } else {
+                        alert("添加失败：" + data.msg);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert("添加失败，发生错误。");
+                });
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>查询老人</title>
+    <style>
+        body {
+            background-image: url("image/background.jpg");
+            background-size: cover;
+            background-repeat: no-repeat;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        header {
+            background-color: white;
+            color: black;
+            text-align: center;
+            padding: 20px 0;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        nav {
+            background-color: #FFB300;
+            padding: 10px 0;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            padding: 10px 20px;
+            display: inline-block;
+            font-size: 18px;
+            margin: 0 10px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        nav a:hover {
+            background-color: #3F51B5;
+            color: #fff;
+            border-radius: 5px;
+        }
+
+        .form-container {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 400px;
+        }
+
+        .form-container h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .form-container label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .form-container input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .form-container button {
+            width: 100%;
+            padding: 10px;
+            background-color: #FFB300;
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .form-container button:hover {
+            background-color: #3F51B5;
+        }
+
+        .elderly-list {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 800px;
+        }
+
+        .elderly-item {
+            border-bottom: 1px solid #ccc;
+            padding: 10px 0;
+        }
+
+        .elderly-image {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+        }
+
+        .elderly-details {
+            display: inline-block;
+            vertical-align: top;
+            margin-left: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>养老院管理系统</h1>
+    </header>
+    <nav>
+        <a href="test001.html">主页</a>
+        <a href="#.html">查询老人</a>
+        <a href="addElderly.html">添加老人</a>
+        <a href="deleteElderly.html">删除老人</a>
+    </nav>
+    <div class="form-container">
+        <h2>查询老人</h2>
+        <form id="search-elderly-form">
+            <label for="searchName">姓名:</label>
+            <input type="text" id="searchName" name="searchName" required>
+            <button type="submit">搜索</button>
+        </form>
+    </div>
+    <div id="elderly-list" class="elderly-list">
+        <!-- 这里将显示搜索结果 -->
+    </div>
+    <script>
+        document.getElementById('search-elderly-form').addEventListener('submit', function (event) {
+            event.preventDefault();
+    
+            const formData = new FormData(event.target);
+            const name = formData.get('searchName');
+    
+            fetch(`http://localhost:8080/searchElderly?name=${encodeURIComponent(name)}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => response.json())
+                .then(responseData => {
+                    displayElderlyData(responseData.data);
+                })
+                .catch(error => {
+                    console.error('Error searching elderly:', error);
+                    alert('查询老人信息失败');
+                });
+        });
+
+        function displayElderlyData(data) {
+            const elderlyList = document.getElementById('elderly-list');
+            elderlyList.innerHTML = ''; // 清空现有内容
+
+            if (data && data.length > 0) {
+                data.forEach(user => {
+                    const userDiv = document.createElement('div');
+                    userDiv.classList.add('elderly-item');
+                    userDiv.innerHTML = `
+                        <img src="${user.image}" alt="User Image" class="elderly-image">
+                        <div class="elderly-details">
+                            <p>ID: ${user.ID}</p>
+                            <p>姓名: ${user.name}</p>
+                            <p>年龄: ${user.age}</p>
+                            <p>房间: ${user.room}</p>
+                            <p>疾病: ${user.disease || 'N/A'}</p>
+                            <p>婚姻状态: ${user.marriageStatus}</p>
+                            <p>电话号码: ${user.phoneNumber}</p>
+                        </div>
+                    `;
+                    elderlyList.appendChild(userDiv);
+                });
+            } else {
+                elderlyList.innerHTML = '<p>未找到匹配的老人</p>';
+            }
+        }
+    </script>
+</body>
+
+</html>

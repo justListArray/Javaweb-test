@@ -1,0 +1,24 @@
+<!-- src/main/resources/applicationContext.xml -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <bean id="orderService" class="com.example.service.OrderService" />
+
+    <bean id="loggingAspect" class="com.example.aspect.LoggingAspect" />
+
+    <aop:config>
+        <aop:aspect ref="loggingAspect">
+            <aop:pointcut id="placeOrderPointcut" expression="execution(* com.example.service.OrderService.placeOrder(..))" />
+            <aop:before method="beforeAdvice" pointcut-ref="placeOrderPointcut" />
+            <aop:after-returning method="afterReturningAdvice" pointcut-ref="placeOrderPointcut" returning="retVal" />
+            <aop:after-throwing method="afterThrowingAdvice" pointcut-ref="placeOrderPointcut" throwing="ex" />
+            <aop:after method="afterAdvice" pointcut-ref="placeOrderPointcut" />
+            <aop:around method="aroundAdvice" pointcut-ref="placeOrderPointcut" />
+        </aop:aspect>
+    </aop:config>
+</beans>

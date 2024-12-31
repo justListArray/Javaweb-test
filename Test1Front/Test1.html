@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>养老院管理系统</title>
+    <style>
+        /* 重写样式 */
+        body {
+            background-image: url("image/background.jpg");
+            background-size: cover;
+            background-repeat: no-repeat;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        header {
+            background-color: white; /* 深蓝色 */
+            color: black;
+            text-align: center;
+            padding: 20px 0;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        nav {
+            background-color: #FFB300; /* 黄色 */
+            padding: 10px 0;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            padding: 10px 20px;
+            display: inline-block;
+            font-size: 18px;
+            margin: 0 10px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        nav a:hover {
+            background-color: #3F51B5; /* 深蓝色 */
+            color: #fff;
+            border-radius: 5px;
+        }
+
+        #backend-response {
+            margin: 20px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .elderly-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 2px solid #FFB300; /* 黄色 */
+            background-color: white;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+
+        .elderly-item:hover {
+            transform: scale(1.02);
+        }
+
+        .elderly-image {
+            flex: 0 0 auto;
+            margin-right: 20px;
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 2px solid #3F51B5; /* 深蓝色 */
+        }
+
+        .elderly-details {
+            flex: 1 1 auto;
+        }
+
+        .elderly-details p {
+            margin: 0 0 5px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>养老院管理系统</h1>
+    </header>
+    <nav>
+        <a href="#searchElderly" onclick="searchElderly()">查询老人</a>
+        <a href="#addElderly" onclick="addElderly()">添加老人</a>
+        <a href="#deleteElderly" onclick="deleteElderly()">删除老人</a>
+    </nav>
+    <div id="backend-response">
+        <!-- 这里将会接受后端传来的请求 -->
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            fetchElderlyData();
+        });
+
+        function fetchElderlyData() {
+            fetch('http://localhost:8080/getElderly')
+                .then(response => response.json())
+                .then(responseData => {
+                    if (responseData.code === 1 && responseData.msg === "success") {
+                        displayElderlyData(responseData.data);
+                    } else {
+                        console.error('Error fetching data:', responseData.msg);
+                    }
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        }
+
+        function displayElderlyData(data) {
+            const userDataDiv = document.getElementById('backend-response');
+            userDataDiv.innerHTML = ''; // Clear existing content
+            if (data && data.length > 0) {
+                data.forEach(user => {
+                    const userDiv = document.createElement('div');
+                    userDiv.classList.add('elderly-item');
+                    userDiv.innerHTML = `
+                        <img src="${user.image}" alt="User Image" class="elderly-image">
+                        <div class="elderly-details">
+                            <p>ID: ${user.id}</p>
+                            <p>Name: ${user.name}</p>
+                            <p>Age: ${user.age}</p>
+                            <p>Room: ${user.room}</p>
+                            <p>Disease: ${user.disease || 'N/A'}</p>
+                            <p>Marriage Status: ${user.marriageStatus}</p>
+                            <p>Phone Number: ${user.phoneNumber}</p>
+                        </div>
+                    `;
+                    userDataDiv.appendChild(userDiv);
+                });
+            } else {
+                userDataDiv.innerHTML = '<p>No data available</p>';
+            }
+        }
+
+        function searchElderly() {
+            alert('查询老人功能待实现');
+        }
+
+        function addElderly() {
+            alert('添加老人功能待实现');
+        }
+
+        function deleteElderly() {
+            alert('删除老人功能待实现');
+        }
+    </script>
+</body>
+
+</html>

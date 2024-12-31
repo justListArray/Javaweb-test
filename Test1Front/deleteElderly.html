@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>删除老人</title>
+    <style>
+        body {
+            background-image: url("image/background.jpg");
+            background-size: cover;
+            background-repeat: no-repeat;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: rgba(255, 255, 255, 0.8);
+            color: #000;
+            text-align: center;
+            padding: 20px 0;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+        }
+
+        nav {
+            background-color: #FFB300;
+            padding: 10px 0;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            padding: 10px 20px;
+            display: inline-block;
+            font-size: 18px;
+            margin: 0 10px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        nav a:hover {
+            background-color: #3F51B5;
+            color: #fff;
+            border-radius: 5px;
+        }
+
+        .form-container {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .form-container h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #3F51B5;
+        }
+
+        .form-container label {
+            display: block;
+            margin-bottom: 5px;
+            color: #3F51B5;
+            font-weight: bold;
+        }
+
+        .form-container input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+
+        .form-container button {
+            width: 100%;
+            padding: 10px;
+            background-color: #FFB300;
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .form-container button:hover {
+            background-color: #3F51B5;
+        }
+
+        .form-container button:active {
+            background-color: #FF6F00;
+        }
+
+        #backend-response {
+            margin: 20px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>删除老人</h1>
+    </header>
+    <nav>
+        <a href="test001.html">主页</a>
+        <a href="searchElderly.html">查询老人</a>
+        <a href="addElderly.html">添加老人</a>
+        <a href="#">删除老人</a>
+    </nav>
+    <div class="form-container">
+        <h2>删除老人</h2>
+        <form id="delete-elderly-form">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+            <button type="submit">删除</button>
+        </form>
+    </div>
+    <div id="backend-response"></div>
+
+    <script>
+        document.getElementById('delete-elderly-form').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const formData = new FormData(event.target);
+            const name = formData.get('name');
+
+            fetch(`http://localhost:8080/deleteElderly?name=${encodeURIComponent(name)}`, {
+                method: 'GET'
+            })
+                .then(response => response.json())
+                .then(responseData => {
+                    const responseDiv = document.getElementById('backend-response');
+                    if (responseData.code === 1 && responseData.msg === "success") {
+                        alert('老人信息删除成功');
+                        responseDiv.innerHTML = `<p>老人信息删除成功</p>`;
+                        responseDiv.style.color = 'green';
+                        event.target.reset(); // 重置表单
+                    } else {
+                        console.error('Error deleting elderly:', responseData.msg);
+                        responseDiv.innerHTML = `<p>删除老人信息失败: ${responseData.msg}</p>`;
+                        responseDiv.style.color = 'red';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error deleting elderly:', error);
+                    const responseDiv = document.getElementById('backend-response');
+                    responseDiv.innerHTML = `<p>删除老人信息失败</p>`;
+                    responseDiv.style.color = 'red';
+                });
+        });
+    </script>
+</body>
+
+</html>

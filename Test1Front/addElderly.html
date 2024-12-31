@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>添加老人</title>
+    <style>
+        body {
+            background-image: url("image/background.jpg");
+            background-size: cover;
+            background-repeat: no-repeat;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: rgba(255, 255, 255, 0.8);
+            color: #000;
+            text-align: center;
+            padding: 20px 0;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+        }
+
+        nav {
+            background-color: #FFB300;
+            padding: 10px 0;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            padding: 10px 20px;
+            display: inline-block;
+            font-size: 18px;
+            margin: 0 10px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        nav a:hover {
+            background-color: #3F51B5;
+            color: #fff;
+            border-radius: 5px;
+        }
+
+        .form-container {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .form-container h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #3F51B5;
+        }
+
+        .form-container label {
+            display: block;
+            margin-bottom: 5px;
+            color: #3F51B5;
+            font-weight: bold;
+        }
+
+        .form-container input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+
+        .form-container button {
+            width: 100%;
+            padding: 10px;
+            background-color: #FFB300;
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .form-container button:hover {
+            background-color: #3F51B5;
+        }
+
+        .form-container button:active {
+            background-color: #FF6F00;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>养老院管理系统</h1>
+    </header>
+    <nav>
+        <a href="test001.html">主页</a>
+        <a href="index.html">查询老人</a>
+        <a href="addElderly.html">添加老人</a>
+        <a href="deleteElderly.html">删除老人</a>
+    </nav>
+    <div class="form-container">
+        <h2>添加老人</h2>
+        <form id="add-elderly-form">
+            <label for="ID">ID:</label>
+            <input type="number" id="ID" name="ID" required>
+
+            <label for="image">Image URL:</label>
+            <input type="text" id="image" name="image" required>
+
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+
+            <label for="age">Age:</label>
+            <input type="number" id="age" name="age" required>
+
+            <label for="room">Room:</label>
+            <input type="text" id="room" name="room" required>
+
+            <label for="disease">Disease:</label>
+            <input type="text" id="disease" name="disease">
+
+            <label for="marriageStatus">Marriage Status:</label>
+            <input type="text" id="marriageStatus" name="marriageStatus" required>
+
+            <label for="phoneNumber">Phone Number:</label>
+            <input type="text" id="phoneNumber" name="phoneNumber" required>
+
+            <button type="submit">添加</button>
+        </form>
+    </div>
+    <script>
+        document.getElementById('add-elderly-form').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const formData = new FormData(event.target);
+            const elderly = {
+                ID: parseInt(formData.get('ID')),  // 将 ID 转换为整数
+                image: formData.get('image'),
+                name: formData.get('name'),
+                age: parseInt(formData.get('age')),  // 将 age 转换为整数
+                room: formData.get('room'),
+                disease: formData.get('disease') || '',  // 确保 disease 是一个字符串
+                marriageStatus: formData.get('marriageStatus'),
+                phoneNumber: formData.get('phoneNumber')
+            };
+
+            const queryString = new URLSearchParams(elderly).toString();
+            console.log(queryString);
+
+            fetch(`http://localhost:8080/addElderly?${queryString}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            })
+            .then(response => response.json())
+            .then(responseData => {
+                if (responseData.code === 1 && responseData.msg === "success") {
+                    alert('添加成功');
+                    event.target.reset(); // 重置表单
+                } else {
+                    console.error('Error response:', responseData);
+                    alert('添加失败: ' + (responseData.msg || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Fetch error:', error);
+                alert('添加失败: ' + error.message);
+            });
+        });
+    </script>
+</body>
+
+</html>
+
